@@ -1,7 +1,15 @@
 package net.quantrax.citybuild;
 
+import net.quantrax.citybuild.database.Properties;
+import net.quantrax.citybuild.database.StaticSaduLoader;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class CityBuildPlugin extends JavaPlugin {
+public final class CityBuildPlugin extends JavaPlugin {
+
+	@Override
+	public void onLoad() {
+		final Properties properties = new Properties("localhost", "3306", "citybuild", "root", ""); // Local test-database with credentials. Has to be reworked when publishing
+		StaticSaduLoader.start(properties);
+	}
 
 }
