@@ -25,6 +25,8 @@ dependencies {
 
     implementation ("de.derioo:CommandFramework:3.1.4-RELEASE")
     implementation ("de.derioo:InventoryFramwork:6.1.5")
+    implementation ("com.google.code.gson:gson:2.10.1")
+
 }
 
 tasks {
