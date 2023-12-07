@@ -26,7 +26,6 @@ dependencies {
     compileOnly("io.papermc.paper:paper-api:1.20.2-R0.1-SNAPSHOT")
     compileOnly("net.quantrax:QuantraxAPI:1.3.2.1")
 
-
     implementation("de.derioo:CommandFramework:3.1.4-RELEASE")
     implementation("de.derioo:InventoryFramwork:6.1.5")
     implementation("com.google.code.gson:gson:2.10.1")
