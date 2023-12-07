@@ -1,4 +1,4 @@
-package net.quantrax.citybuild.player;
+package net.quantrax.citybuild.global.player;
 
 import de.chojo.sadu.wrapper.util.UpdateResult;
 import org.bukkit.Bukkit;

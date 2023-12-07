@@ -5,7 +5,7 @@ import de.derioo.inventoryframework.objects.InventoryFramework;
 import de.derioo.manager.CommandFramework;
 import lombok.Getter;
 import net.quantrax.citybuild.global.GlobalModels;
-import net.quantrax.citybuild.support.SupportManager;
+import net.quantrax.citybuild.module.support.SupportManager;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;

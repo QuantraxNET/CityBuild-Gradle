@@ -1,9 +1,8 @@
-package net.quantrax.citybuild.support.player;
+package net.quantrax.citybuild.module.support.player;
 
 import lombok.Getter;
 import lombok.Setter;
-import net.quantrax.api.QuantraxAPI;
-import net.quantrax.citybuild.support.chat.Chat;
+import net.quantrax.citybuild.module.support.chat.Chat;
 
 import java.util.Optional;
 import java.util.UUID;
