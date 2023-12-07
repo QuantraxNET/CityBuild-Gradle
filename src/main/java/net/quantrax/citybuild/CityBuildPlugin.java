@@ -1,6 +1,9 @@
 package net.quantrax.citybuild;
 
+import de.derioo.inventoryframework.objects.InventoryFramework;
+import de.derioo.manager.CommandFramework;
 import lombok.Getter;
+import net.quantrax.citybuild.support.SupportManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class CityBuildPlugin extends JavaPlugin {
@@ -13,4 +16,11 @@ public class CityBuildPlugin extends JavaPlugin {
         CityBuildPlugin.instance = this;
     }
 
+    @Override
+    public void onEnable() {
+        new CommandFramework(this);
+        new InventoryFramework(this);
+
+        new SupportManager(this);
+    }
 }
