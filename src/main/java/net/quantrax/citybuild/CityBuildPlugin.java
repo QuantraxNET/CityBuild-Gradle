@@ -14,13 +14,6 @@ import java.util.Arrays;
 
 public class CityBuildPlugin extends JavaPlugin {
 
-    @Getter
-    private static CityBuildPlugin instance;
-
-    @Override
-    public void onLoad() {
-        CityBuildPlugin.instance = this;
-    }
 
     @Override
     public void onEnable() {
