@@ -63,11 +63,7 @@ public class Chat {
                     }
 
 
-                    try {
-                        textChannelById.delete().queueAfter(5, TimeUnit.SECONDS).get();
-                    } catch (InterruptedException | ExecutionException e) {
-                        throw new RuntimeException(e);
-                    }
+                    textChannelById.delete().queueAfter(5, TimeUnit.SECONDS);
 
 
                     return "";
