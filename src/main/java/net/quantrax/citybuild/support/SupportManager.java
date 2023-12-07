@@ -70,6 +70,7 @@ public class SupportManager extends ListenerAdapter implements Listener {
 
         Bukkit.getPluginManager().registerEvents(this, this.plugin);
 
+        CommandFramework.register(new SupportCommand(this.plugin, this));
 
     }
 
