@@ -1,12 +1,12 @@
 package net.quantrax.citybuild;
 
 import com.google.common.reflect.ClassPath;
-import org.bukkit.Bukkit;
-import org.bukkit.event.Listener;
 import de.derioo.inventoryframework.objects.InventoryFramework;
 import de.derioo.manager.CommandFramework;
 import lombok.Getter;
 import net.quantrax.citybuild.support.SupportManager;
+import org.bukkit.Bukkit;
+import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class CityBuildPlugin extends JavaPlugin {
