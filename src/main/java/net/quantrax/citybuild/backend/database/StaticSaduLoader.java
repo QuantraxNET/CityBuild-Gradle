@@ -1,4 +1,4 @@
-package net.quantrax.citybuild.database;
+package net.quantrax.citybuild.backend.database;
 
 import com.zaxxer.hikari.HikariDataSource;
 import de.chojo.sadu.databases.MariaDb;

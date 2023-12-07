@@ -1,4 +1,4 @@
-package net.quantrax.citybuild.database.exception;
+package net.quantrax.citybuild.backend.database.exception;
 
 public class AlreadyInitializedException extends RuntimeException {
 }

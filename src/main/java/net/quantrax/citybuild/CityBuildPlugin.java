@@ -1,7 +1,7 @@
 package net.quantrax.citybuild;
 
-import net.quantrax.citybuild.database.Properties;
-import net.quantrax.citybuild.database.StaticSaduLoader;
+import net.quantrax.citybuild.backend.database.Properties;
+import net.quantrax.citybuild.backend.database.StaticSaduLoader;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class CityBuildPlugin extends JavaPlugin {

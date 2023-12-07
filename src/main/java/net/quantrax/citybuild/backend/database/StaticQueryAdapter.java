@@ -1,9 +1,9 @@
-package net.quantrax.citybuild.database;
+package net.quantrax.citybuild.backend.database;
 
 import de.chojo.sadu.base.QueryFactory;
 import de.chojo.sadu.wrapper.stage.QueryStage;
-import net.quantrax.citybuild.database.exception.AlreadyInitializedException;
-import net.quantrax.citybuild.database.exception.NotInitializedException;
+import net.quantrax.citybuild.backend.database.exception.AlreadyInitializedException;
+import net.quantrax.citybuild.backend.database.exception.NotInitializedException;
 import org.jetbrains.annotations.NotNull;
 
 import javax.sql.DataSource;
