@@ -3,7 +3,6 @@ package net.quantrax.citybuild;
 import com.google.common.reflect.ClassPath;
 import de.derioo.inventoryframework.objects.InventoryFramework;
 import de.derioo.manager.CommandFramework;
-import lombok.Getter;
 import net.quantrax.citybuild.global.GlobalModels;
 import net.quantrax.citybuild.module.support.SupportManager;
 import org.bukkit.Bukkit;

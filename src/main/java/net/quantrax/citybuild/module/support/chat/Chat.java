@@ -1,14 +1,15 @@
 package net.quantrax.citybuild.module.support.chat;
 
 import com.google.common.base.Preconditions;
+import de.derioo.inventoryframework.interfaces.InventoryAnimation;
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.kyori.adventure.audience.Audience;
-import net.quantrax.citybuild.support.SupportManager;
-import net.quantrax.citybuild.support.player.QueueMember;
-import net.quantrax.citybuild.support.player.Supporter;
-import net.quantrax.citybuild.utils.DiscordWebhook;
+import net.quantrax.citybuild.module.support.SupportManager;
+import net.quantrax.citybuild.module.support.discordbot.utils.DiscordWebhook;
+import net.quantrax.citybuild.module.support.player.QueueMember;
+import net.quantrax.citybuild.module.support.player.Supporter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -18,7 +19,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Getter
@@ -56,7 +56,7 @@ public class Chat {
                     }
 
 
-                    textChannelById.delete().queueAfter(5, TimeUnit.SECONDS);
+                    textChannelById.delete().queueAfter(5, InventoryAnimation.TimeUnit.SECONDS);
 
 
                     return "";
