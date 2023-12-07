@@ -1,15 +1,49 @@
 package net.quantrax.citybuild;
 
-import net.quantrax.citybuild.backend.database.Properties;
-import net.quantrax.citybuild.backend.database.StaticSaduLoader;
+import com.google.common.reflect.ClassPath;
+import de.derioo.inventoryframework.objects.InventoryFramework;
+import de.derioo.manager.CommandFramework;
+import lombok.Getter;
+import net.quantrax.citybuild.support.SupportManager;
+import org.bukkit.Bukkit;
+import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public final class CityBuildPlugin extends JavaPlugin {
+public class CityBuildPlugin extends JavaPlugin {
 
-	@Override
-	public void onLoad() {
-		final Properties properties = new Properties("localhost", "3306", "citybuild", "root", ""); // Local test-database with credentials. Has to be reworked when publishing
-		StaticSaduLoader.start(properties);
-	}
+    @Getter
+    private static CityBuildPlugin instance;
 
+    @Override
+    public void onLoad() {
+        CityBuildPlugin.instance = this;
+    }
+
+    @Override
+    public void onEnable() {
+        new CommandFramework(this);
+        new InventoryFramework(this);
+
+        new SupportManager(this);
+
+        registerListener();
+    }
+
+    @Override
+    public void onDisable() {
+
+    }
+
+    public void registerListener() {
+        try {
+            for (ClassPath.ClassInfo classInfo : ClassPath.from(getClassLoader())
+                    .getTopLevelClasses("net.quantrax.citybuild.listener")) {
+                Class<?> clazz = Class.forName(classInfo.getName());
+                if (Listener.class.isAssignableFrom(clazz))
+                    Bukkit.getPluginManager().registerEvents((Listener) clazz.getDeclaredConstructor().newInstance(), this);
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
 }
