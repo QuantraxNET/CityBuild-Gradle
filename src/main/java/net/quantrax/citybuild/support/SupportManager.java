@@ -77,11 +77,12 @@ public class SupportManager extends ListenerAdapter implements Listener {
         return instance;
     }
 
-    public void createChat(QueueMember player, Supporter supporter) {
-
-        Chat chat = new Chat(List.of(player), List.of(supporter));
+    public void createChat(QueueMember player, Optional<Supporter> supporter) {
+        List<Supporter> sups = List.of();
+        supporter.ifPresent(sup -> sups.add(sup));
+        Chat chat = new Chat(List.of(player), sups);
         player.setChat(Optional.of(chat));
-        supporter.getOpenChats().add(chat);
+        supporter.ifPresent(sup -> sup.setOpenChats(Optional.of(chat)));
 
 
         CompletableFuture.supplyAsync(() -> {
@@ -155,11 +156,6 @@ public class SupportManager extends ListenerAdapter implements Listener {
     }
 
     @EventHandler // TODO: 07.12.2023 HARDCODE
-    public void onPlayerJoin(PlayerJoinEvent e) {
-        this.createChat(this.queueMemberManager.createPlayer(e.getPlayer().getUniqueId()), this.supportManager.createPlayer(e.getPlayer().getUniqueId()));
-    }
-
-    @EventHandler // TODO: 07.12.2023 HARDCODE
     public void onQuit(PlayerQuitEvent e) {
         this.chats.stream().filter(chat -> chat.isInChat(e.getPlayer().getUniqueId())).findFirst()
                 .ifPresent(chat -> {
@@ -167,7 +163,6 @@ public class SupportManager extends ListenerAdapter implements Listener {
                     this.chats.remove(chat);
                 });
     }
-
     private Component getFormat(String name, String rank, Component message) {
         return MiniMessage.miniMessage().deserialize("<red>Support | <rank> <name>  -> <message>", // TODO: 07.12.2023 HARDCODE
                 Placeholder.component("name", Component.text(name)),
