@@ -1,13 +1,16 @@
 package net.quantrax.citybuild.player;
 
 import de.chojo.sadu.wrapper.util.UpdateResult;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-import static net.quantrax.citybuild.database.StaticQueryAdapter.builder;
+import static net.quantrax.citybuild.backend.database.StaticQueryAdapter.builder;
 
 public class CityBuildPlayer {
 
@@ -55,6 +58,48 @@ public class CityBuildPlayer {
 	}
 
 	/**
+	 * Adds the specified value of coins asynchronously to the database for the player.
+	 *
+	 * @param value the value of coins to be added
+	 *
+	 * @return a CompletableFuture that will be completed with an Optional containing the new total amount of coins after the addition. If any exception occurs during the operation,
+	 * an empty Optional is returned.
+	 */
+	public CompletableFuture<Optional<Integer>> addCoins(int value) {
+		return this.coins()
+				.whenComplete((oldValue, $) -> {
+					final int newValue = oldValue.orElse(0) + value;
+
+					builder().query("UPDATE citybuild.player_coins SET value=? WHERE player_id=?;")
+							.parameter(stmt -> stmt.setInt(newValue).setInt(this.playerId))
+							.update()
+							.send();
+				})
+				.exceptionally($ -> Optional.empty());
+	}
+
+	/**
+	 * Subtracts the given value from the current coins value asynchronously. The new value can not be lower than zero.
+	 *
+	 * @param value the value to subtract from the coins
+	 *
+	 * @return a CompletableFuture that will be completed with an Optional containing the new total amount of coins after the subtraction. If any exception occurs during the operation,
+	 * an empty Optional is returned.
+	 */
+	public CompletableFuture<Optional<Integer>> subtractCoins(int value) {
+		return this.coins()
+				.whenComplete((oldValue, $) -> {
+					final int newValue = Math.max(oldValue.orElse(0) - value, 0); // The new value of saved coins cannot be lower than 0
+
+					builder().query("UPDATE citybuild.player_coins SET value=? WHERE player_id=?;")
+							.parameter(stmt -> stmt.setInt(newValue).setInt(this.playerId))
+							.update()
+							.send();
+				})
+				.exceptionally($ -> Optional.empty());
+	}
+
+	/**
 	 * Retrieves the amount of coins for the player asynchronously from the database.
 	 *
 	 * @return a CompletableFuture that will be completed with an Optional containing the amount of coins. If no dataset with the given player_id is present, an empty Optional will be
@@ -68,16 +113,14 @@ public class CityBuildPlayer {
 	}
 
 	/**
-	 * Synchronously retrieves the amount of coins for the player from the database.
+	 * Retrieves the Bukkit Player object corresponding to this CityBuildPlayer.
 	 *
-	 * @return an Optional containing the amount of coins. If no dataset with the given player_id is present, an empty Optional will be returned.
+	 * @return the Bukkit Player object, or null if the player is not online
 	 */
-	public Optional<Integer> coinsSync() {
-		return builder(Integer.class).query("SELECT value FROM citybuild.player_coins WHERE player_id=?;")
-				.parameter(stmt -> stmt.setInt(this.playerId))
-				.readRow(row -> row.getInt("value"))
-				.firstSync();
+	public @Nullable Player asBukkitPlayer() {
+		return Bukkit.getPlayer(this.uuid);
 	}
+
 
 	private int playerId() {
 		return builder(Integer.class).query("SELECT id FROM citybuild.citybuild_player WHERE uuid=?;")
