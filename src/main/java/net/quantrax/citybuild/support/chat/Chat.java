@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -50,27 +52,28 @@ public class Chat {
             TextChannel textChannelById = SupportManager.getInstance().getBot().getGuild().getTextChannelById(id);
             Preconditions.checkArgument(textChannelById != null, "Textchannel ist null - " + id);
             if (this.webhook.isPresent()) {
-                DiscordWebhook webhook = new DiscordWebhook(this.getWebhook().get());
-                webhook.setUserName("SERVER");
-                webhook.setContent("Der User ist gequittet, der Channel wir bald entfernt");
-                try {
-                    webhook.execute();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-
-                new Thread(() -> { //TODO: make it cleaner, Thread.sleep is not optimal
+                CompletableFuture.supplyAsync(() -> {
+                    DiscordWebhook webhook = new DiscordWebhook(this.getWebhook().get());
+                    webhook.setUserName("SERVER");
+                    webhook.setContent("Der User ist gequittet, der Channel wir bald entfernt");
                     try {
-                        Thread.sleep(3000);
-                    } catch (InterruptedException e) {
+                        webhook.execute();
+                    } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
-                    textChannelById.delete().queue();
-                }).start();
+
+
+                    try {
+                        textChannelById.delete().queueAfter(5, TimeUnit.SECONDS).get();
+                    } catch (InterruptedException | ExecutionException e) {
+                        throw new RuntimeException(e);
+                    }
+
+
+                    return "";
+                });
             }
         });
-
-
 
 
     }

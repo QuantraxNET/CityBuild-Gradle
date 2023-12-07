@@ -1,5 +1,6 @@
 package net.quantrax.citybuild.support;
 
+import com.google.common.util.concurrent.AtomicDouble;
 import de.derioo.manager.CommandFramework;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import lombok.Getter;
@@ -30,6 +31,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -37,7 +39,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class SupportManager extends ListenerAdapter implements Listener {
 
 
-    public final static String TEMP_CHANNEL_CATEGORY = "1182361623340515489";
+    public final static String TEMP_CHANNEL_CATEGORY = "1182361623340515489"; // TODO: 07.12.2023 HARDCODE
 
     public static final String DISCORD_BOT_TOKEN = "MTA3NDA3NjQzMDkzNTI3NzYzOQ.GNK0IM.cpma7-hTEJryDy6_wP7R79jHuz81pAwnAZ2fkc";
 
@@ -82,16 +84,20 @@ public class SupportManager extends ListenerAdapter implements Listener {
         supporter.getOpenChats().add(chat);
 
 
-        String channelName = player.getName() + "-" + chat.getUuid();
-        TextChannel channel = this.bot.getGuild().createTextChannel(channelName,
-                this.bot.getGuild().getCategoryById(SupportManager.TEMP_CHANNEL_CATEGORY)).complete();
+        CompletableFuture.supplyAsync(() -> {
+            String channelName = player.getName() + "-" + chat.getUuid(); // TODO: 07.12.2023 HARDCODE
+            TextChannel channel = this.bot.getGuild().createTextChannel(channelName,
+                    this.bot.getGuild().getCategoryById(SupportManager.TEMP_CHANNEL_CATEGORY)).complete();
 
 
-        chat.setDiscordChannelID(Optional.of(channel.getIdLong()));
+            chat.setDiscordChannelID(Optional.of(channel.getIdLong()));
 
-        chat.setWebhook(Optional.of(channel.createWebhook("webhook").complete().getUrl()));
+            chat.setWebhook(Optional.of(channel.createWebhook("webhook").complete().getUrl()));
 
-        this.chats.add(chat);
+            this.chats.add(chat);
+
+            return "";
+        });
     }
 
     @Override
@@ -105,7 +111,7 @@ public class SupportManager extends ListenerAdapter implements Listener {
         if (chat == null) return;
 
 
-        Component message = getFormat(event.getAuthor().getName(), "DISCORD", Component.text(event.getMessage().getContentRaw()));
+        Component message = getFormat(event.getAuthor().getName(), "DISCORD", Component.text(event.getMessage().getContentRaw())); // TODO: 07.12.2023 HARDCODE
         chat.allMembersAsForwardingAudience()
                 .sendMessage(message);
 
@@ -128,42 +134,42 @@ public class SupportManager extends ListenerAdapter implements Listener {
 
                         event.renderer((source1, sourceDisplayName, message, viewer) ->
                                 getFormat(source.getName(),
-                                        chat.isTeamler(source.getUniqueId()) ? "TEAM" : "USER", message));
+                                        chat.isTeamler(source.getUniqueId()) ? "TEAM" : "USER", message)); // TODO: 07.12.2023 HARDCODE
 
                         if (chat.getWebhook().isEmpty()) return;
-                        Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> {
+                        CompletableFuture.supplyAsync(() -> {
                             DiscordWebhook webhook = new DiscordWebhook(chat.getWebhook().get());
-                            webhook.setUserName(source.getName());
-                            webhook.setContent(PlainTextComponentSerializer.plainText().serialize(event.message()));
+                            webhook.setUserName(source.getName()); // TODO: 07.12.2023 HARDCODE
+                            webhook.setContent(PlainTextComponentSerializer.plainText().serialize(event.message())); // TODO: 07.12.2023 HARDCODE
                             try {
                                 webhook.execute();
                             } catch (IOException e) {
                                 throw new RuntimeException(e);
                             }
+                            return "";
                         });
                     }
                 });
 
 
-
     }
 
-    @EventHandler
+    @EventHandler // TODO: 07.12.2023 HARDCODE
     public void onPlayerJoin(PlayerJoinEvent e) {
         this.createChat(this.queueMemberManager.createPlayer(e.getPlayer().getUniqueId()), this.supportManager.createPlayer(e.getPlayer().getUniqueId()));
     }
 
-    @EventHandler
+    @EventHandler // TODO: 07.12.2023 HARDCODE
     public void onQuit(PlayerQuitEvent e) {
         this.chats.stream().filter(chat -> chat.isInChat(e.getPlayer().getUniqueId())).findFirst()
-                .ifPresent(chat ->{
+                .ifPresent(chat -> {
                     chat.close();
                     this.chats.remove(chat);
                 });
     }
 
     private Component getFormat(String name, String rank, Component message) {
-        return MiniMessage.miniMessage().deserialize("<red>Support | <rank> <name>  -> <message>",
+        return MiniMessage.miniMessage().deserialize("<red>Support | <rank> <name>  -> <message>", // TODO: 07.12.2023 HARDCODE
                 Placeholder.component("name", Component.text(name)),
                 Placeholder.component("rank", Component.text(rank)),
                 Placeholder.component("message", message));
