@@ -1,4 +1,4 @@
-package net.quantrax.citybuild.support.commands;
+package net.quantrax.citybuild.module.support.commands;
 
 import de.derioo.annotations.CommandProperties;
 import de.derioo.interfaces.Command;

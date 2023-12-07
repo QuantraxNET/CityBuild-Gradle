@@ -1,4 +1,4 @@
-package net.quantrax.citybuild.utils;
+package net.quantrax.citybuild.module.support.discordbot.utils;
 
 
 import com.google.gson.JsonArray;
