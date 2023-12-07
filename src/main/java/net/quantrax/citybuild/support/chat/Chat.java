@@ -12,15 +12,20 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.quantrax.citybuild.support.SupportManager;
 import net.quantrax.citybuild.support.player.QueueMember;
 import net.quantrax.citybuild.support.player.Supporter;
+import net.quantrax.citybuild.utils.DiscordWebhook;
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.entity.Player;
 import org.w3c.dom.stylesheets.LinkStyle;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Getter
@@ -30,6 +35,7 @@ public class Chat {
     private final UUID uuid = UUID.randomUUID();
     private final List<QueueMember> members;
     private final List<Supporter> teamlers;
+    private Optional<String> webhook = Optional.empty();
     private Optional<Long> discordChannelID = Optional.empty();
 
     private boolean isClosed = false;
@@ -45,11 +51,31 @@ public class Chat {
         this.discordChannelID.ifPresent(id -> {
             TextChannel textChannelById = SupportManager.getInstance().getBot().getGuild().getTextChannelById(id);
             Preconditions.checkArgument(textChannelById != null, "Textchannel ist null - " + id);
-            textChannelById.delete().queue();
+            if (this.webhook.isPresent()) {
+                CompletableFuture.supplyAsync(() -> {
+                    DiscordWebhook webhook = new DiscordWebhook(this.getWebhook().get());
+                    webhook.setUserName("SERVER");
+                    webhook.setContent("Der User ist gequittet, der Channel wir bald entfernt");
+                    try {
+                        webhook.execute();
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+
+
+                    textChannelById.delete().queueAfter(5, TimeUnit.SECONDS);
+
+
+                    return "";
+                });
+            }
         });
 
 
+    }
 
+    public boolean isTeamler(UUID uuid) {
+        return this.teamlers.stream().map(Supporter::getUuid).toList().contains(uuid);
     }
 
     public boolean isInChat(UUID uuid) {
