@@ -4,10 +4,13 @@ import com.google.common.reflect.ClassPath;
 import de.derioo.inventoryframework.objects.InventoryFramework;
 import de.derioo.manager.CommandFramework;
 import lombok.Getter;
+import net.quantrax.citybuild.global.GlobalModels;
 import net.quantrax.citybuild.support.SupportManager;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.Arrays;
 
 public class CityBuildPlugin extends JavaPlugin {
 
@@ -26,7 +29,7 @@ public class CityBuildPlugin extends JavaPlugin {
 
         new SupportManager(this);
 
-        registerListener();
+        registerListener(GlobalModels.REGISTER_PATHS);
     }
 
     @Override
@@ -34,16 +37,18 @@ public class CityBuildPlugin extends JavaPlugin {
 
     }
 
-    public void registerListener() {
-        try {
-            for (ClassPath.ClassInfo classInfo : ClassPath.from(getClassLoader())
-                    .getTopLevelClasses("net.quantrax.citybuild.listener")) {
-                Class<?> clazz = Class.forName(classInfo.getName());
-                if (Listener.class.isAssignableFrom(clazz))
-                    Bukkit.getPluginManager().registerEvents((Listener) clazz.getDeclaredConstructor().newInstance(), this);
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
+    public void registerListener(String[] paths) {
+      Arrays.stream(paths).forEach(p -> {
+          try {
+              for (ClassPath.ClassInfo classInfo : ClassPath.from(getClassLoader())
+                      .getTopLevelClasses(p)) {
+                  Class<?> clazz = Class.forName(classInfo.getName());
+                  if (Listener.class.isAssignableFrom(clazz))
+                      Bukkit.getPluginManager().registerEvents((Listener) clazz.getDeclaredConstructor().newInstance(), this);
+              }
+          } catch (Exception ex) {
+              ex.printStackTrace();
+          }
+      });
     }
 }
