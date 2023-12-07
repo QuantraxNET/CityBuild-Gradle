@@ -20,6 +20,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -34,7 +35,7 @@ public class SupportManager extends ListenerAdapter implements Listener {
 
     public final static String TEMP_CHANNEL_CATEGORY = "1182361623340515489";
 
-    public static final String DISCORD_BOT_TOKEN = "MTA3NDA3NjQzMDkzNTI3NzYzOQ.G1cyrl.lqU8eO2cwf6idC8k_DxGrCZcOWB9zW4mcwbZ2Y";
+    public static final String DISCORD_BOT_TOKEN = "MTA3NDA3NjQzMDkzNTI3NzYzOQ.GNK0IM.cpma7-hTEJryDy6_wP7R79jHuz81pAwnAZ2fkc";
 
 
     private static SupportManager instance;
@@ -64,7 +65,6 @@ public class SupportManager extends ListenerAdapter implements Listener {
         Bukkit.getPluginManager().registerEvents(this, this.plugin);
 
 
-        //CommandFramework.register(new SupportCommand());
     }
 
     public static SupportManager getInstance() {
@@ -72,7 +72,6 @@ public class SupportManager extends ListenerAdapter implements Listener {
     }
 
     public void createChat(QueueMember player, Supporter supporter) {
-        System.out.println("TEst");
 
         Chat chat = new Chat(List.of(player), List.of(supporter));
         player.setChat(Optional.of(chat));
@@ -97,8 +96,12 @@ public class SupportManager extends ListenerAdapter implements Listener {
         if (!event.getChannelType().equals(ChannelType.TEXT)) return;
         long id = event.getChannel().getIdLong();
         Chat chat = this.chats.stream().filter(c -> !c.isClosed() && c.getDiscordChannelID().isPresent()
-                && c.getDiscordChannelID().get() == id).findFirst().orElse(null);
+                  && c.getDiscordChannelID().get() == id).findFirst().orElse(null);
+
+
         if (chat == null) return;
+
+
 
         chat.allMembersAsForwardingAudience()
                 .sendMessage(getFormat(event.getAuthor().getName(), Component.text(event.getMessage().getContentRaw())));
@@ -129,6 +132,12 @@ public class SupportManager extends ListenerAdapter implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e) {
         this.createChat(this.queueMemberManager.createPlayer(e.getPlayer().getUniqueId()), this.supportManager.createPlayer(e.getPlayer().getUniqueId()));
+    }
+
+    @EventHandler
+    public void onQuit(PlayerQuitEvent e) {
+        this.chats.stream().filter(chat -> chat.isInChat(e.getPlayer().getUniqueId())).findFirst()
+                .ifPresent(Chat::close);
     }
 
     private Component getFormat(String name, Component message) {

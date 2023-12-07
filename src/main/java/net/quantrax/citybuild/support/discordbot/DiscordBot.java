@@ -16,12 +16,18 @@ public class DiscordBot {
 
 
     public DiscordBot(String token) {
-        this.jda = JDABuilder.createDefault(token)
-                .enableIntents(GatewayIntent.MESSAGE_CONTENT) // enables explicit access to message.getContentDisplay()
-                .build();
+        try {
+            this.jda = JDABuilder.createDefault(token)
+                    .enableIntents(GatewayIntent.MESSAGE_CONTENT) // enables explicit access to message.getContentDisplay()
+                    .build().awaitReady();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         this.jda.addEventListener(SupportManager.getInstance());
 
-        this.guild = this.jda.getGuilds().get(0);
+        this.guild = this.jda.getGuildById("1126216975375401021");
+
+
     }
 
 
