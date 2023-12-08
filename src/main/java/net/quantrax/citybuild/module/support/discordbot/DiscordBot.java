@@ -15,7 +15,7 @@ public class DiscordBot {
     private final Guild guild;
 
 
-    public DiscordBot(String token) {
+    public DiscordBot(String token, String guildID) {
         try {
             this.jda = JDABuilder.createDefault(token)
                     .enableIntents(GatewayIntent.MESSAGE_CONTENT) // enables explicit access to message.getContentDisplay()
@@ -25,7 +25,7 @@ public class DiscordBot {
         }
         this.jda.addEventListener(SupportManager.getInstance());
 
-        this.guild = this.jda.getGuildById("1126216975375401021");
+        this.guild = this.jda.getGuildById(guildID);
 
 
     }

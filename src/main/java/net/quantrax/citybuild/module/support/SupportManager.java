@@ -13,6 +13,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import net.quantrax.citybuild.config.Config;
 import net.quantrax.citybuild.module.support.chat.Chat;
 import net.quantrax.citybuild.module.support.commands.SupportCommand;
 import net.quantrax.citybuild.module.support.discordbot.DiscordBot;
@@ -36,16 +37,18 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Getter
-public class SupportManager extends ListenerAdapter implements Listener {
+public class SupportManager extends ListenerAdapter implements Listener, Config {
 
 
-    public final static String TEMP_CHANNEL_CATEGORY = "1182361623340515489"; // TODO: 07.12.2023 HARDCODE
+    public static String TEMP_CHANNEL_CATEGORY;
 
-    public static final String DISCORD_BOT_TOKEN = "MTA3NDA3NjQzMDkzNTI3NzYzOQ.GNK0IM.cpma7-hTEJryDy6_wP7R79jHuz81pAwnAZ2fkc";
+    public static String DISCORD_BOT_TOKEN;
 
 
     private static SupportManager instance;
 
+
+    private final UUID configID;
     private final DiscordBot bot;
 
     @NotNull
@@ -66,7 +69,12 @@ public class SupportManager extends ListenerAdapter implements Listener {
         instance = this;
 
         this.plugin = plugin;
-        this.bot = new DiscordBot(DISCORD_BOT_TOKEN);
+        this.configID = this.loadConfig(null, "config.yml", plugin);
+
+        SupportManager.TEMP_CHANNEL_CATEGORY = this.get("support-system.discord.temp-channel-category-id").toString();
+        SupportManager.DISCORD_BOT_TOKEN = this.get("support-system.discord.token").toString();
+
+        this.bot = new DiscordBot(DISCORD_BOT_TOKEN, this.get("support-system.discord.guild-id").toString());
 
         Bukkit.getPluginManager().registerEvents(this, this.plugin);
 
@@ -85,7 +93,9 @@ public class SupportManager extends ListenerAdapter implements Listener {
 
 
         CompletableFuture.supplyAsync(() -> {
-            String channelName = player.getName() + "-" + chat.getUuid(); // TODO: 07.12.2023 HARDCODE
+            String channelName = get("support-syste.discord.discord-channel-name").toString()
+                    .replace("<player>", player.getName())
+                    .replace("<id>", chat.getUuid().toString());
             TextChannel channel = this.bot.getGuild().createTextChannel(channelName,
                     this.bot.getGuild().getCategoryById(SupportManager.TEMP_CHANNEL_CATEGORY)).complete();
 
@@ -111,7 +121,7 @@ public class SupportManager extends ListenerAdapter implements Listener {
         if (chat == null) return;
 
 
-        Component message = getFormat(event.getAuthor().getName(), "DISCORD", Component.text(event.getMessage().getContentRaw())); // TODO: 07.12.2023 HARDCODE
+        Component message = getFormat(event.getAuthor().getName(), get("support-system.ranks.discord").toString(), Component.text(event.getMessage().getContentRaw()));
         chat.allMembersAsForwardingAudience()
                 .sendMessage(message);
 
@@ -134,13 +144,19 @@ public class SupportManager extends ListenerAdapter implements Listener {
 
                         event.renderer((source1, sourceDisplayName, message, viewer) ->
                                 getFormat(source.getName(),
-                                        chat.isTeamler(source.getUniqueId()) ? "TEAM" : "USER", message)); // TODO: 07.12.2023 HARDCODE
+                                        chat.isTeamler(source.getUniqueId()) ? get("support-system.ranks.team").toString() : get("support-system.ranks.user").toString(), message));
 
                         if (chat.getWebhook().isEmpty()) return;
                         CompletableFuture.supplyAsync(() -> {
                             DiscordWebhook webhook = new DiscordWebhook(chat.getWebhook().get());
-                            webhook.setUserName(source.getName()); // TODO: 07.12.2023 HARDCODE
-                            webhook.setContent(PlainTextComponentSerializer.plainText().serialize(event.message())); // TODO: 07.12.2023 HARDCODE
+                            webhook.setUserName(PlainTextComponentSerializer.plainText().serialize(
+                                    getMessage("support-system-discord.minecraft-integration.discord.webhook-name" +
+                                            source.getName(), event.message())
+                            ));
+                            webhook.setContent(PlainTextComponentSerializer.plainText().serialize(
+                                    getMessage("support-system-discord.minecraft-integration.discord.webhook-content" +
+                                            source.getName(), event.message())
+                            ));
                             try {
                                 webhook.execute();
                             } catch (IOException e) {
@@ -154,12 +170,8 @@ public class SupportManager extends ListenerAdapter implements Listener {
 
     }
 
-    @EventHandler // TODO: 07.12.2023 HARDCODE
-    public void onPlayerJoin(PlayerJoinEvent e) {
-        this.createChat(this.queueMemberManager.createPlayer(e.getPlayer().getUniqueId()), this.supportManager.createPlayer(e.getPlayer().getUniqueId()));
-    }
 
-    @EventHandler // TODO: 07.12.2023 HARDCODE
+    @EventHandler
     public void onQuit(PlayerQuitEvent e) {
         this.chats.stream().filter(chat -> chat.isInChat(e.getPlayer().getUniqueId())).findFirst()
                 .ifPresent(chat -> {
@@ -169,10 +181,7 @@ public class SupportManager extends ListenerAdapter implements Listener {
     }
 
     private Component getFormat(String name, String rank, Component message) {
-        return MiniMessage.miniMessage().deserialize("<red>Support | <rank> <name>  -> <message>", // TODO: 07.12.2023 HARDCODE
-                Placeholder.component("name", Component.text(name)),
-                Placeholder.component("rank", Component.text(rank)),
-                Placeholder.component("message", message));
+        return getMessage("support-system.discord.minecraft-integration.minecraft.format", name, rank, message);
     }
 
     private boolean isInAnyChat(Player source) {
@@ -183,6 +192,11 @@ public class SupportManager extends ListenerAdapter implements Listener {
         });
 
         return isInChat.get();
+    }
+
+    @Override
+    public UUID getUUID() {
+        return this.configID;
     }
 
     public static class PlayerGetter<T> {
