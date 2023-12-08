@@ -4,6 +4,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -125,6 +126,9 @@ public interface Config {
         placeholders.add(Placeholder.parsed("prefix", "prefix"));
 
         for (int i = 0; i < args.length; i++) {
+            if (args[i] instanceof Component component) {
+                args[i] = PlainTextComponentSerializer.plainText().serialize(component);
+            }
             placeholders.add(Placeholder.parsed(String.valueOf(i), args[i] == null ? "null" : args[i].toString()));
         }
 
