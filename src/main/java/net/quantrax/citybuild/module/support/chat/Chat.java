@@ -5,10 +5,10 @@ import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.kyori.adventure.audience.Audience;
-import net.quantrax.citybuild.support.SupportManager;
-import net.quantrax.citybuild.support.player.QueueMember;
-import net.quantrax.citybuild.support.player.Supporter;
-import net.quantrax.citybuild.utils.DiscordWebhook;
+import net.quantrax.citybuild.module.support.SupportManager;
+import net.quantrax.citybuild.module.support.discordbot.utils.DiscordWebhook;
+import net.quantrax.citybuild.module.support.player.QueueMember;
+import net.quantrax.citybuild.module.support.player.Supporter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
