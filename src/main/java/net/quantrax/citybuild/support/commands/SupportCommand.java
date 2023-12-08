@@ -107,7 +107,6 @@ public class SupportCommand extends Command {
             return;
         }
         body.player().sendMessage(MiniMessage.miniMessage().deserialize("Du siehst jetzt nicht mehr deinen chat"));
-        player.getChat().get().close();
         player.getChat().get().getMembers().remove(player);
     }
 
@@ -118,8 +117,8 @@ public class SupportCommand extends Command {
         if (player == null) {
             player = this.queueManager.createPlayer(body.player().getUniqueId());
         }
-        if (player.getChat().isPresent()) {
-            //Has chat
+        if (player.getChat().isEmpty()) {
+            //Has no chat
             body.player().sendMessage(MiniMessage.miniMessage().deserialize("Ey du hast ja gar keinen chat"));
             return;
         }
@@ -127,7 +126,7 @@ public class SupportCommand extends Command {
         player.getChat().orElseThrow().getMembers().add(player);
     }
 
-    @Mapping(args = "support join", extraPermission = true, permission = "support.supporter")
+    @Mapping(args = "manage join", extraPermission = true, permission = "support.supporter")
     public void joinSupport(CommandBody body) {
         Supporter supporter = this.teamManager.getPlayer(body.player().getUniqueId());
         if (supporter == null) {
@@ -142,7 +141,7 @@ public class SupportCommand extends Command {
         body.player().sendMessage(MiniMessage.miniMessage().deserialize("Ey du bist nun gejoint"));
     }
 
-    @Mapping(args = "support leave", extraPermission = true, permission = "support.supporter")
+    @Mapping(args = "manage leave", extraPermission = true, permission = "support.supporter")
     public void leaveSupport(CommandBody body) {
         Supporter supporter = this.teamManager.getPlayer(body.player().getUniqueId());
         if (supporter == null) {
@@ -157,14 +156,14 @@ public class SupportCommand extends Command {
         body.player().sendMessage(MiniMessage.miniMessage().deserialize("Ey du bist nun geleaved"));
     }
 
-    @Mapping(args = "support list", extraPermission = true, permission = "support.supporter")
+    @Mapping(args = "manage list", extraPermission = true, permission = "support.supporter")
     public void listSupports(CommandBody body) {
         body.player().sendMessage(MiniMessage.miniMessage().deserialize("Hier sind alle QueuePlayer"));
         this.manager.getQueue().forEach(player -> {
             //Format: <players> <joinDiff> <id> (Chat id if present)
             body.player().sendMessage(MiniMessage.miniMessage().deserialize(
-                    "<click:copy_to_clipboard:<id>><player> -> <joindiff> ms (Klicke um die Chat ID zu kopieren)</click>" +
-                            " Klicke <click:run_command:/support joinchat <id>><gold>hier</gold</click> um dem Chat zu joinen",
+                    "<hover:show_text:<id>><click:copy_to_clipboard:<id>><player> -> <joindiff> ms (Klicke um die Chat ID zu kopieren)</click></hover>" +
+                            " Klicke <click:run_command:/support joinchat <id>><gold>hier</gold></click> um dem Chat zu joinen",
                     Placeholder.component("player", Component.text(player.getName())),
                     Placeholder.component("joindiff", Component.text(System.currentTimeMillis() - player.getQueueJoinTime())),
                     Placeholder.parsed("id", (player.getChat().isPresent() ?
@@ -173,7 +172,7 @@ public class SupportCommand extends Command {
         });
     }
 
-    @Mapping(args = "joinchat {id}", extraPermission = true, permission = "support.supporter")
+    @Mapping(args = "manage joinchat {id}", extraPermission = true, permission = "support.supporter")
     @Possibilities(args = "{id}->~all~")
     public void joinChatAsSupporter(CommandBody body) {
         Supporter supporter = this.teamManager.getPlayer(body.player().getUniqueId());
@@ -203,7 +202,54 @@ public class SupportCommand extends Command {
             body.player().sendMessage(MiniMessage.miniMessage().deserialize("Ey dings ehm dieser Chat exestiert nicht"));
             return;
         }
+        optionalQueueMember.get().getChat().orElseThrow().getMembers().add(this.queueManager.getPlayer(optionalQueueMember.get().getUuid()));
         optionalQueueMember.get().getChat().orElseThrow().getTeamlers().add(supporter);
         body.player().sendMessage(MiniMessage.miniMessage().deserialize("Du bist dem Chat gejoint"));
+    }
+
+    @Mapping(args = "manage closechat {id}", extraPermission = true, permission = "support.supporter")
+    @Possibilities(args = "{id}->~all~")
+    public void closeChat(CommandBody body) {
+        Supporter supporter = this.teamManager.getPlayer(body.player().getUniqueId());
+        if (supporter == null) {
+            supporter = this.teamManager.createPlayer(body.player().getUniqueId());
+        }
+
+        if (!this.manager.getActiveTeam().contains(supporter)) {
+            //Already joined
+            body.player().sendMessage(MiniMessage.miniMessage().deserialize("Ey du bist nicht in den support gejoint"));
+            return;
+        }
+
+
+        UUID chatID;
+        try {
+            chatID = UUID.fromString(body.get("id"));
+        } catch (Exception e) {
+            //Invaild UUID
+            body.player().sendMessage(MiniMessage.miniMessage().deserialize("Dings das keine richtige UUID"));
+            return;
+        }
+
+        Optional<QueueMember> optionalQueueMember = this.manager.getQueue().stream().filter(player -> player.getChat().isPresent() && !player.getChat().get().isClosed() && player.getChat().get().getUuid().equals(chatID)).findAny();
+        if (optionalQueueMember.isEmpty()) {
+            //uuid doesnt "exists"
+            body.player().sendMessage(MiniMessage.miniMessage().deserialize("Ey dings ehm dieser Chat exestiert nicht"));
+            return;
+        }
+        optionalQueueMember.get().getChat().get().close();
+        body.player().sendMessage(MiniMessage.miniMessage().deserialize("Der Chat wird geclosed"));
+    }
+
+    @Mapping(args = "manage closechat {id}", extraPermission = true, permission = "support.supporter")
+    @Possibilities(args = "{id}-><ChatID>")
+    public void closeChatPlaceholder(CommandBody body) {
+        closeChat(body);
+    }
+
+    @Mapping(args = "manage joinchat {id}", extraPermission = true, permission = "support.supporter")
+    @Possibilities(args = "{id}-><ChatID>")
+    public void joinChatPlaceholder(CommandBody body) {
+        joinChat(body);
     }
 }
