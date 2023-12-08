@@ -60,7 +60,6 @@ public class Chat {
 
                     textChannelById.delete().queueAfter(10, TimeUnit.SECONDS);
 
-
                     return "";
                 });
             }

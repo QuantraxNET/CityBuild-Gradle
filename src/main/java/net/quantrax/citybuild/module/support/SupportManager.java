@@ -1,5 +1,6 @@
 package net.quantrax.citybuild.module.support;
 
+import com.google.common.util.concurrent.AtomicDouble;
 import de.derioo.manager.CommandFramework;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import lombok.Getter;
@@ -22,6 +23,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
@@ -31,6 +33,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Getter
 public class SupportManager extends ListenerAdapter implements Listener {
@@ -66,7 +69,6 @@ public class SupportManager extends ListenerAdapter implements Listener {
         this.bot = new DiscordBot(DISCORD_BOT_TOKEN);
 
         Bukkit.getPluginManager().registerEvents(this, this.plugin);
-
         CommandFramework.register(new SupportCommand(this.plugin, this));
 
     }
@@ -152,6 +154,7 @@ public class SupportManager extends ListenerAdapter implements Listener {
 
 
     }
+
 
     @EventHandler // TODO: 07.12.2023 HARDCODE
     public void onQuit(PlayerQuitEvent e) {
