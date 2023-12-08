@@ -163,7 +163,7 @@ public class SupportCommand extends Command {
             //Format: <players> <joinDiff> <id> (Chat id if present)
             body.player().sendMessage(MiniMessage.miniMessage().deserialize(
                     "<hover:show_text:<id>><click:copy_to_clipboard:<id>><player> -> <joindiff> ms (Klicke um die Chat ID zu kopieren)</click></hover>" +
-                            " Klicke <click:run_command:/support joinchat <id>><gold>hier</gold></click> um dem Chat zu joinen",
+                            " Klicke <click:run_command:/support manage joinchat <id>><gold>hier</gold></click> um dem Chat zu joinen",
                     Placeholder.component("player", Component.text(player.getName())),
                     Placeholder.component("joindiff", Component.text(System.currentTimeMillis() - player.getQueueJoinTime())),
                     Placeholder.parsed("id", (player.getChat().isPresent() ?
