@@ -1,0 +1,14 @@
+support-system:
+  discord:
+    token: ""
+    guild-id: "1126216975375401021"
+    temp-channel-category-id: "1182361623340515489"
+    discord-channel-name: "<player>-<id>"
+    minecraft-integration:
+      minecraft:
+        format: "<red>Support | <1> <0>  -> <2>"
+      discord:
+        webhook-name: "<0>"
+        webhook-content: "Nachricht von <0>: <1>"
+  ranks:
+    discord: "DISCORD"
