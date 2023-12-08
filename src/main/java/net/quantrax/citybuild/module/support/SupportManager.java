@@ -1,4 +1,4 @@
-package net.quantrax.citybuild.support;
+package net.quantrax.citybuild.module.support;
 
 import com.google.common.util.concurrent.AtomicDouble;
 import de.derioo.manager.CommandFramework;
@@ -13,12 +13,12 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
-import net.quantrax.citybuild.support.chat.Chat;
-import net.quantrax.citybuild.support.commands.SupportCommand;
-import net.quantrax.citybuild.support.discordbot.DiscordBot;
-import net.quantrax.citybuild.support.player.QueueMember;
-import net.quantrax.citybuild.support.player.Supporter;
-import net.quantrax.citybuild.utils.DiscordWebhook;
+import net.quantrax.citybuild.module.support.chat.Chat;
+import net.quantrax.citybuild.module.support.commands.SupportCommand;
+import net.quantrax.citybuild.module.support.discordbot.DiscordBot;
+import net.quantrax.citybuild.module.support.player.QueueMember;
+import net.quantrax.citybuild.module.support.player.Supporter;
+import net.quantrax.citybuild.module.support.discordbot.utils.DiscordWebhook;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
