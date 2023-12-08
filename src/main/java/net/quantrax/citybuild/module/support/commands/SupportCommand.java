@@ -1,4 +1,4 @@
-package net.quantrax.citybuild.support.commands;
+package net.quantrax.citybuild.module.support.commands;
 
 import de.derioo.annotations.CommandProperties;
 import de.derioo.annotations.Mapping;
@@ -8,9 +8,9 @@ import de.derioo.objects.CommandBody;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
-import net.quantrax.citybuild.support.SupportManager;
-import net.quantrax.citybuild.support.player.QueueMember;
-import net.quantrax.citybuild.support.player.Supporter;
+import net.quantrax.citybuild.module.support.SupportManager;
+import net.quantrax.citybuild.module.support.player.QueueMember;
+import net.quantrax.citybuild.module.support.player.Supporter;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
