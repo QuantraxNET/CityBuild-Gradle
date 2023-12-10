@@ -16,8 +16,11 @@ repositories {
     mavenCentral()
     maven("https://repo.papermc.io/repository/maven-public/")
 
-    maven("https://nexus.derioo.de/nexus/content/repositories/CommandFramework")
-    maven("https://nexus.derioo.de/nexus/content/repositories/InventoryFramwork")
+    maven {
+        name = "reposiliteRepositoryReleases"
+        url = uri("https://nexus.derioo.de/releases")
+    }
+
     maven("https://repo.quantrax.net/nexus/content/repositories/releases")
 
 }
@@ -26,8 +29,9 @@ dependencies {
     compileOnly("io.papermc.paper:paper-api:1.20.2-R0.1-SNAPSHOT")
     compileOnly("net.quantrax:QuantraxAPI:1.3.2.1")
 
-    implementation("de.derioo:CommandFramework:3.1.7")
-    implementation("de.derioo:InventoryFramwork:6.1.5")
+    implementation("de.derioo:CommandFramework:4.1.0")
+    implementation("de.derioo:InventoryFramework:4.1.0")
+
     implementation("com.google.code.gson:gson:2.10.1")
     implementation("net.dv8tion:JDA:5.0.0-beta.18")
 
