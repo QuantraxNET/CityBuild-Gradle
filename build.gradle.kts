@@ -62,6 +62,11 @@ bukkit {
     contributors = listOf("ExceptionThread", "DeRio_", "ByTRYO")
 
     commands {
+
+        register("support") {
+
+        }
+
         /*
         Register your commands here.
 

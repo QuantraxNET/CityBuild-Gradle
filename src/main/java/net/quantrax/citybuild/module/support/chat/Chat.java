@@ -41,6 +41,8 @@ public class Chat {
     public void close() {
         this.isClosed = true;
 
+        SupportManager.getInstance().getQueue().removeAll(this.members);
+
         this.discordChannelID.ifPresent(id -> {
             TextChannel textChannelById = SupportManager.getInstance().getBot().getGuild().getTextChannelById(id);
             Preconditions.checkArgument(textChannelById != null, "Textchannel ist null - " + id);
@@ -48,7 +50,7 @@ public class Chat {
                 CompletableFuture.supplyAsync(() -> {
                     DiscordWebhook webhook = new DiscordWebhook(this.getWebhook().get());
                     webhook.setUserName("SERVER");
-                    webhook.setContent("Der User ist gequittet, der Channel wir bald entfernt");
+                    webhook.setContent("Der Channel wir bald entfernt");
                     try {
                         webhook.execute();
                     } catch (IOException e) {
@@ -56,8 +58,7 @@ public class Chat {
                     }
 
 
-                    textChannelById.delete().queueAfter(5, TimeUnit.SECONDS);
-
+                    textChannelById.delete().queueAfter(10, TimeUnit.SECONDS);
 
                     return "";
                 });

@@ -77,7 +77,7 @@ public class SupportManager extends ListenerAdapter implements Listener, Config 
         this.bot = new DiscordBot(DISCORD_BOT_TOKEN, this.get("support-system.discord.guild-id").toString());
 
         Bukkit.getPluginManager().registerEvents(this, this.plugin);
-
+        CommandFramework.register(new SupportCommand(this.plugin, this));
 
     }
 
@@ -85,11 +85,12 @@ public class SupportManager extends ListenerAdapter implements Listener, Config 
         return instance;
     }
 
-    public void createChat(QueueMember player, Supporter supporter) {
-
-        Chat chat = new Chat(List.of(player), List.of(supporter));
+    public void createChat(QueueMember player, Optional<Supporter> supporter) {
+        List<Supporter> sups = List.of();
+        supporter.ifPresent(sup -> sups.add(sup));
+        Chat chat = new Chat(List.of(player), sups);
         player.setChat(Optional.of(chat));
-        supporter.getOpenChats().add(chat);
+        supporter.ifPresent(sup -> sup.setOpenChats(Optional.of(chat)));
 
 
         CompletableFuture.supplyAsync(() -> {
@@ -179,7 +180,6 @@ public class SupportManager extends ListenerAdapter implements Listener, Config 
                     this.chats.remove(chat);
                 });
     }
-
     private Component getFormat(String name, String rank, Component message) {
         return getMessage("support-system.discord.minecraft-integration.minecraft.format", name, rank, message);
     }
